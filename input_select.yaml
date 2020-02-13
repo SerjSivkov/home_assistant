@@ -1,0 +1,8 @@
+hass_theme:
+  name: HomeAssistant Themes
+  options:
+    - default
+    - google_light
+    - google_dark
+  initial: default
+  icon: mdi:theme-light-dark

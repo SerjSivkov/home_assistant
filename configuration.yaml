@@ -1,0 +1,233 @@
+homeassistant:
+  name: SerjSivkov Home
+  # Location HomeAssistant
+  latitude: !secret home_latitude
+  longitude: !secret home_longitude
+  elevation: !secret home_elevation
+
+  unit_system: metric
+  time_zone: Europe/Moscow
+
+  #customize: !include_dir_merge_named includes/customize
+  # Include Packages
+  # packages: !include_dir_named packages
+  #auth_providers:
+   #- type: homeassistant
+   #- type: legacy_api_password
+   #  api_password: !secret http_password
+
+  #whitelist_external_dirs:
+  # - /config
+  # - /config/bash
+
+# Configure a default setup of Home Assistant (frontend, api, etc)
+default_config:
+
+# Stream component for camera
+stream:
+
+lovelace:
+  mode: yaml
+
+# Enables the frontend
+frontend:
+  themes: !include_dir_merge_named themes
+  javascript_version: latest
+
+# Enables configuration UI
+config:
+
+# Enables a map showing the location of tracked devices
+map:
+
+# Track the sun
+sun:
+
+http:
+  #api_password: !secret http_password
+  base_url: !secret home_url
+  ssl_certificate: /ssl/fullchain.pem
+  ssl_key: /ssl/privkey.pem
+  ssl_profile: intermediate
+
+#Платформы
+tuya:
+  username: !secret tuya_username
+  password: !secret tuya_password
+  country_code: 380
+
+mqtt:
+  broker: 192.168.50.77
+  discovery: true
+  discovery_prefix: homeassistant
+  username: mqtt
+  password: mqtt
+
+weather:
+  - platform: openweathermap
+    api_key: !secret openweathermap_key
+  # blocked!
+  #- platform: yandex_weather
+    #api_key: !secret yandex_weather_token
+
+# Text to speech
+tts:
+  - platform: google_translate
+    cache: true
+    cache_dir: /tmp/tts
+    service_name: google_say
+
+# Кастомные карты
+hacs:
+  token: !secret HACS_github_token
+  appdaemon: true
+  python_script: true
+  theme: true
+
+# Import other settings
+group: !include groups.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml
+shell_command: !include shell_commands.yaml
+#scene: !include scenes.yaml
+sensor: !include sensors.yaml
+
+panel_iframe:
+  ide:
+    title: IDE
+    icon: mdi:code-braces
+    url: !secret panel_url_ide
+  #portainer:
+    #title: Portainer
+    #icon: mdi:database
+    #url: !secret panel_url_portainer
+
+# no_ip:
+#   domain: !secret no_ip_domain
+#   username: !secret no_ip_username
+#   password: !secret no_ip_password
+
+telegram_bot:
+  - platform: polling
+    proxy_url: !secret telegram_proxy_url
+    proxy_params:
+      username: !secret telegram_proxy_username
+      password: !secret telegram_proxy_password
+    api_key: !secret telegram_bot_token
+    allowed_chat_ids:
+      - !secret telegram_bot_chat_id
+
+notify:
+  - name: telegram
+    platform: telegram
+    chat_id: !secret telegram_bot_chat_id
+
+xiaomi_aqara:
+  #interface: '192.168.50.1'
+  discovery_retry: 10
+  gateways:
+    - mac: 78:11:DC:FA:A5:84
+      key: !secret gateway_api
+      host: 192.168.50.141
+      # token: !secret gateway_token
+light:
+  - platform: xiaomi_miio
+    name: xiami_phillips_table_lamp
+    host: 192.168.50.134
+    token: !secret xiami_phillips_table_lamp_token
+    model: philips.light.sread1
+  - platform: yeelight
+    devices:
+      192.168.50.135:
+        name: ramina_table_lamp
+
+#yeelight:
+#  devices:
+#    192.168.50.135:
+#      name: Xiaomi Mi LED Desk Lamp
+#      model: lamp1
+# Xiaomi Mi LED Desk Lamp
+#   - platform: lamp1
+    # name: Xiaomi Mi LED Desk Lamp
+    # host: 192.168.50.135
+    # token: !secret xiaomi_mi_led_lamp_token
+    # model: light.lamp1
+
+# Aqara Smart Camera Gateway 1080p
+camera:
+  - platform: xiaomi
+    name: Aqara Smart Camera Gateway
+    host: 192.168.50.136
+    #model: 'aqara'
+    model: "yi"
+    #token: !secret aqara_smart_camera_gateway_token
+    password: !secret aqara_smart_camera_gateway_password
+# camera:
+#   - platform: xiaomi
+#     name: Aqara Smart Camera Gateway
+#     host: 192.168.50.136
+#     steam_inage_url: 'url'
+#     steam_source: 'source'
+
+# Xiaomi WiFi Power Strip
+switch:
+  - platform: xiaomi_miio
+    name: xiaomi_power_strip
+    host: 192.168.50.137
+    token: !secret xiaomi_power_strip_token
+    model: qmi.powerstrip.v1
+
+remote:
+  - platform: xiaomi_miio
+    name: "bedroom remote"
+    host: 192.168.50.139
+    token: !secret xiaomi_remote_token
+    slot: 3
+    timeout: 30
+    hidden: false
+
+fan:
+  - platform: xiaomi_miio
+    name: Xiaomi Air Purifier 3
+    host: 192.168.50.140
+    token: !secret xiaomi_airpurifier_token
+    model: zhimi.airpurifier.v3
+
+media_player:
+  - platform: harman_kardon_avr
+    host: 192.168.50.142
+
+# asuswrt:
+#   host: 192.168.50.1
+#   username: !secret asuswrt_user
+#   password: !secret asuswrt_password
+#   sensors:
+    # - upload
+    # - download
+    # - upload_speed
+    # - download_speed
+
+# device_tracker:
+#   - platform: asuswrt
+    # track_new_devices: true
+  # Xiaomi Mi WiFi Repeater 2
+  #- platform: xiaomi_miio
+    # host: 192.168.50.138
+    # token: !secret xiaomi_repeater_token
+
+# Google Home Integration
+google_assistant:
+  project_id: !secret google_project_id
+  api_key: !secret google_api_key
+  exposed_domains:
+    - switch
+    - light
+  #entity_config:
+    #switch.kitchen:
+      #name: CUSTOM_NAME_FOR_GOOGLE_ASSISTANT
+      #aliases:
+        #- BRIGHT_LIGHTS
+        #- ENTRY_LIGHTS
+    #light.living_room:
+      #expose: false
+      #room: LIVING_ROOM

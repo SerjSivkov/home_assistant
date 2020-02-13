@@ -1,0 +1,47 @@
+- platform: ping
+  host: 192.168.50.100
+  name: notebook_xiaomi
+  count: 2
+  scan_interval: 30
+
+- platform: ping
+  host: 192.168.50.101
+  name: pc
+  count: 2
+  scan_interval: 30
+
+- platform: ping
+  host: 192.168.50.102
+  name: notebook_lenevo
+  count: 2
+  scan_interval: 30
+
+- platform: ping
+  host: 192.168.50.103
+  name: notebook_asus
+  count: 2
+  scan_interval: 30
+
+- platform: ping
+  host: 192.168.50.143
+  name: printer
+  count: 2
+  scan_interval: 30
+
+- platform: ping
+  host: 192.168.50.141
+  name: gateway_br
+  count: 2
+  scan_interval: 30
+
+- platform: ping
+  host: 192.168.50.136
+  name: camera_xiaomi
+  count: 2
+  scan_interval: 30
+
+- platform: ping
+  host: 192.168.50.139
+  name: irbase_br
+  count: 2
+  scan_interval: 30

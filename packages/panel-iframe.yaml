@@ -1,0 +1,9 @@
+panel_iframe:
+  ide:
+    title: IDE
+    icon: mdi:code-braces
+    url: !secret panel_url_ide
+  portainer:
+    title: Portainer
+    url: !secret panel_url_portainer
+    icon: mdi:database

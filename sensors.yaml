@@ -1,0 +1,31 @@
+- platform: command_line
+  name: CPU Temperature
+  command: "cat /sys/class/thermal/thermal_zone0/temp"
+  unit_of_measurement: "°C"
+  value_template: '{{ (value | multiply(0.001)) | round(2) }}'
+
+- platform: epsonworkforce
+  host: 192.168.50.143
+  monitored_conditions:
+    - black
+    - photoblack
+    - yellow
+    - magenta
+    - cyan
+    - clean
+
+- platform: systemmonitor
+  resources:
+    - type: disk_use_percent
+      arg: /
+    - type: memory_free
+    - type: processor_use
+    - type: network_in
+      arg: enp3s0
+    - type: network_out
+      arg: enp3s0
+    - type: last_boot
+    - type: network_in
+      arg: tun0
+    - type: network_out
+      arg: tun0

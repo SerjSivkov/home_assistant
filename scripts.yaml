@@ -1,0 +1,15 @@
+xiaomi_learn:
+  alias: Обучение Xiaomi IR Base
+  sequence:
+    - service: xiaomi_miio.remote_learn_command
+      data:
+        entity_id: remote.kitchen_remote
+
+air_conditioning:
+  alias: Управление кондиционером
+  sequence:
+     - service: remote.send_command
+       entity_id: remote.bedroom_remote
+       data:
+         command:
+           - raw:nE4nMwlk0mszmEsms3mEsm0yAHWYzeYgIdNgJimoAZAM+AOs0AHKagL9MAB2AXMB8wCyAHQDewB/BH8BfwD6mM3AEIKvwMfAX8DDwELAx8CnwBzmEAA=

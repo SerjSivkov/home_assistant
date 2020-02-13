@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE properties SYSTEM 'http://java.sun.com/dtd/properties.dtd'>
+
+<properties>
+
+    <!--
+    Loads default configuration for the Hass.io add-on.
+    WARNING: Do not remove this line!
+    -->
+    <entry key='config.default'>/etc/traccar/hassio.xml</entry>
+
+    <!--
+    This is the main configuration file. All your configuration parameters should be placed in this file.
+    Parameters in the main config file override values in the default file. Do not
+    remove "config.default" parameter from this file unless you know what you are doing.
+    For list of available parameters see following page:
+        https://www.traccar.org/configuration-file/
+    -->
+
+    <!--
+        Remove the comment from the block below to enable MySQL/MariaDB
+        for Traccar. Don't forget to adjust it to your setup.
+        (Usually, just setting the correct USERNAME & PASSWORD).
+    -->
+    <!-- // Remove this line to activate MySQL
+    <entry key='database.driver'>com.mysql.jdbc.Driver</entry>
+    <entry key='database.url'>jdbc:mysql://core-mariadb:3306/traccar?serverTimezone=UTC&amp;useSSL=false&amp;allowMultiQueries=true&amp;autoReconnect=true&amp;useUnicode=yes&amp;characterEncoding=UTF-8&amp;sessionVariables=sql_mode=''</entry>
+    <entry key='database.user'>USERNAME</entry>
+    <entry key='database.password'>PASSWORD</entry>
+    // Remove this line to activate MySQL -->
+
+    <!-- Enter you custom configuration below this line -->
+
+</properties>
