@@ -15,8 +15,6 @@ from ..hacsbase.backup import Backup
 from ..handler.download import async_download_file, async_save_file
 from ..helpers.misc import version_left_higher_then_right
 from ..helpers.install import install_repository, version_to_install
-from custom_components.hacs.helpers.information import get_info_md_content
-from custom_components.hacs.repositories.data import RepositoryData
 
 
 RERPOSITORY_CLASSES = {}
@@ -105,7 +103,7 @@ class HacsRepository(Hacs):
     def __init__(self):
         """Set up HacsRepository."""
 
-        self.data = RepositoryData()
+        self.data = {}
         self.content = RepositoryContent()
         self.content.path = RepositoryPath()
         self.information = RepositoryInformation()
@@ -128,7 +126,7 @@ class HacsRepository(Hacs):
         """Return pending upgrade."""
         if self.status.installed:
             if self.status.selected_tag is not None:
-                if self.status.selected_tag == self.data.default_branch:
+                if self.status.selected_tag == self.information.default_branch:
                     if self.versions.installed_commit != self.versions.available_commit:
                         return True
                     return False
@@ -273,7 +271,7 @@ class HacsRepository(Hacs):
             self.repository_object = await self.github.get_repo(
                 self.information.full_name
             )
-            self.data = self.data.from_dict(self.repository_object.attributes)
+            self.data = self.repository_object.attributes
         except Exception as exception:  # Gotta Catch 'Em All
             if not self.system.status.startup:
                 self.logger.error(exception)
@@ -295,6 +293,9 @@ class HacsRepository(Hacs):
         if self.information.full_name in self.common.blacklist:
             self.validate.errors.append("Repository is in the blacklist.")
             return
+
+        # Step 4: default branch
+        self.information.default_branch = self.repository_object.default_branch
 
         # Step 5: Get releases.
         await self.get_releases()
@@ -318,7 +319,6 @@ class HacsRepository(Hacs):
             self.repository_object = await self.github.get_repo(
                 self.information.full_name
             )
-            self.data = self.data.from_dict(self.repository_object.attributes)
 
         # Set id
         self.information.uid = str(self.repository_object.id)
@@ -346,11 +346,11 @@ class HacsRepository(Hacs):
         self.logger.debug("Getting repository information")
 
         # Set ref
-        self.ref = version_to_install(self)
+        if self.ref is None:
+            self.ref = version_to_install(self)
 
         # Attach repository
         self.repository_object = await self.github.get_repo(self.information.full_name)
-        self.data = self.data.from_dict(self.repository_object.attributes)
 
         # Update tree
         self.tree = await self.repository_object.get_tree(self.ref)
@@ -366,6 +366,9 @@ class HacsRepository(Hacs):
         self.information.stars = self.repository_object.attributes.get(
             "stargazers_count", 0
         )
+
+        # Update default branch
+        self.information.default_branch = self.repository_object.default_branch
 
         # Update last updaeted
         self.information.last_updated = self.repository_object.attributes.get(
@@ -383,7 +386,7 @@ class HacsRepository(Hacs):
         await self.get_repository_manifest_content()
 
         # Update "info.md"
-        self.information.additional_info = await get_info_md_content(self)
+        await self.get_info_md_content()
 
         # Update releases
         await self.get_releases()
@@ -449,6 +452,40 @@ class HacsRepository(Hacs):
         except (AIOGitHubException, Exception):  # Gotta Catch 'Em All
             pass
 
+    async def get_info_md_content(self):
+        """Get the content of info.md"""
+        from ..handler.template import render_template
+
+        if self.ref is None:
+            self.ref = version_to_install(self)
+
+        info = None
+        info_files = ["info", "info.md"]
+
+        if self.repository_manifest is not None:
+            if self.repository_manifest.render_readme:
+                info_files = ["readme", "readme.md"]
+        try:
+            root = await self.repository_object.get_contents("", self.ref)
+            for file in root:
+                if file.name.lower() in info_files:
+
+                    info = await self.repository_object.get_contents(
+                        file.name, self.ref
+                    )
+                    break
+            if info is None:
+                self.information.additional_info = ""
+            else:
+                info = info.content.replace("<svg", "<disabled").replace(
+                    "</svg", "</disabled"
+                )
+
+                self.information.additional_info = render_template(info, self)
+
+        except (AIOGitHubException, Exception):
+            self.information.additional_info = ""
+
     async def get_releases(self):
         """Get repository releases."""
         if self.status.show_beta:
@@ -472,7 +509,7 @@ class HacsRepository(Hacs):
 
         self.releases.last_release_object = self.releases.objects[0]
         if self.status.selected_tag is not None:
-            if self.status.selected_tag != self.data.default_branch:
+            if self.status.selected_tag != self.information.default_branch:
                 for release in self.releases.objects:
                     if release.tag_name == self.status.selected_tag:
                         self.releases.last_release_object = release

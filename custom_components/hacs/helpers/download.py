@@ -16,11 +16,7 @@ class FileInformation:
 
 def should_try_releases(repository):
     """Return a boolean indicating whether to download releases or not."""
-    if repository.repository_manifest.zip_release:
-        if repository.repository_manifest.filename.endswith(".zip"):
-            if repository.ref != repository.data.default_branch:
-                return True
-    if repository.ref == repository.data.default_branch:
+    if repository.ref == repository.information.default_branch:
         return False
     if repository.information.category not in ["plugin", "theme"]:
         return False
@@ -60,18 +56,19 @@ def gather_files_to_download(repository):
         for treefile in tree:
             if treefile.path in ["", "dist"]:
                 if not remotelocation:
-                    if treefile.full_path != repository.information.file_name:
+                    if treefile.filename != repository.information.file_name:
                         continue
                 if remotelocation == "dist" and not treefile.filename.startswith(
                     "dist"
                 ):
                     continue
-                if not treefile.is_directory:
-                    files.append(
-                        FileInformation(
-                            treefile.download_url, treefile.full_path, treefile.filename
-                        )
+                if treefile.is_directory:
+                    continue
+                files.append(
+                    FileInformation(
+                        treefile.download_url, treefile.full_path, treefile.filename
                     )
+                )
         if files:
             return files
 
@@ -79,7 +76,7 @@ def gather_files_to_download(repository):
         if repository.repository_manifest.filename is None:
             if category == "theme":
                 tree = filter_content_return_one_of_type(
-                    repository.tree, "", "yaml", "full_path"
+                    repository.tree, "themes", "yaml", "full_path"
                 )
 
     for path in tree:

@@ -56,19 +56,19 @@ tuya:
   password: !secret tuya_password
   country_code: 380
 
-mqtt:
-  broker: 192.168.50.77
-  discovery: true
-  discovery_prefix: homeassistant
-  username: mqtt
-  password: mqtt
+# mqtt:
+#   broker: 192.168.50.77
+#   discovery: true
+#   discovery_prefix: homeassistant
+#   username: mqtt
+#   password: mqtt
 
 weather:
   - platform: openweathermap
     api_key: !secret openweathermap_key
   # blocked!
   #- platform: yandex_weather
-    #api_key: !secret yandex_weather_token
+  #  api_key: !secret yandex_weather_token
 
 # Text to speech
 tts:
@@ -89,7 +89,6 @@ group: !include groups.yaml
 automation: !include automations.yaml
 script: !include scripts.yaml
 shell_command: !include shell_commands.yaml
-#scene: !include scenes.yaml
 sensor: !include sensors.yaml
 
 panel_iframe:
@@ -102,10 +101,30 @@ panel_iframe:
     #icon: mdi:database
     #url: !secret panel_url_portainer
 
-# no_ip:
-#   domain: !secret no_ip_domain
-#   username: !secret no_ip_username
-#   password: !secret no_ip_password
+asuswrt:
+  host: 192.168.50.1
+  username: !secret asuswrt_user
+  password: !secret asuswrt_password
+  sensors:
+    - upload
+    - download
+    - upload_speed
+    - download_speed
+
+device_tracker:
+  - platform: asuswrt
+    consider_home: 180
+    new_device_defaults:
+      track_new_devices: false
+      hide_if_away: false
+
+# device_tracker:
+#   - platform: asuswrt
+    # track_new_devices: true
+  # Xiaomi Mi WiFi Repeater 2
+  #- platform: xiaomi_miio
+    # host: 192.168.50.138
+    # token: !secret xiaomi_repeater_token
 
 telegram_bot:
   - platform: polling
@@ -196,24 +215,6 @@ fan:
 media_player:
   - platform: harman_kardon_avr
     host: 192.168.50.142
-
-# asuswrt:
-#   host: 192.168.50.1
-#   username: !secret asuswrt_user
-#   password: !secret asuswrt_password
-#   sensors:
-    # - upload
-    # - download
-    # - upload_speed
-    # - download_speed
-
-# device_tracker:
-#   - platform: asuswrt
-    # track_new_devices: true
-  # Xiaomi Mi WiFi Repeater 2
-  #- platform: xiaomi_miio
-    # host: 192.168.50.138
-    # token: !secret xiaomi_repeater_token
 
 # Google Home Integration
 google_assistant:
